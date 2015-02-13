@@ -48,8 +48,3 @@ class NetCDF:
         data = self.get_data(var)
         plt.hist(data)
         plt.show()
-
-
-# test
-n1 = NetCDF("test.nc")
-print (n1.ndims())
