@@ -47,5 +47,6 @@ class NetCDF:
 
     def plot_histogram(self,var):
         data = self.get_data(var)
+        data = data.reshape(self.get_num_of_points(var))
         plt.hist(data)
         plt.show()
