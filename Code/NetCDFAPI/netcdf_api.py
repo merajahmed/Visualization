@@ -1,4 +1,5 @@
 from netCDF4 import *
+import matplotlib.pyplot as plt
 
 class NetCDF:
     def __init__(self,ncdfgroup):
@@ -25,3 +26,30 @@ class NetCDF:
     def get_var_dim_lens(self,var):
         return self.ncdfgroup.variables[var].shape
     
+    def get_var_dim_names(self,var):
+        return self.ncdfgroup.variables[var].dimensions
+
+    def get_num_of_points(self,var):
+        v = 1
+        for dim in self.get_var_dim_lens(var):
+            v = v * dim
+        return v
+
+    def get_num_of_cells(self,var):
+        v = 1
+        for dim in self.get_var_dim_lens(var):
+            v = v * (dim - 1)
+        return v
+
+    def get_data(self,var): # to be tested
+        return self.ncdfgroup.variables[var]
+
+    def plot_histogram(self,var):
+        data = self.get_data(var)
+        plt.hist(data)
+        plt.show()
+
+
+# test
+n1 = NetCDF("test.nc")
+print (n1.ndims())
