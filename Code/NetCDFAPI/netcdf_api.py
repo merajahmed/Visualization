@@ -1,4 +1,5 @@
 from netCDF4 import *
+import numpy as np
 import matplotlib.pyplot as plt
 
 class NetCDF:
@@ -41,8 +42,8 @@ class NetCDF:
             v = v * (dim - 1)
         return v
 
-    def get_data(self,var): # to be tested
-        return self.ncdfgroup.variables[var]
+    def get_data(self,var):
+        return np.array(self.ncdfgroup.variables[var])
 
     def plot_histogram(self,var):
         data = self.get_data(var)
