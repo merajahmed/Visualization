@@ -50,3 +50,10 @@ class NetCDF:
         data = data.reshape(self.get_num_of_points(var))
         plt.hist(data)
         plt.show()
+    
+        
+    def data_at_comp_pos(self,var, c_coords):
+        vardata = self.get_data(var)
+        for i in c_coords:
+            vardata = vardata[i]
+        return vardata
