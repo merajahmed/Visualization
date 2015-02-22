@@ -77,5 +77,5 @@ class NetCDF:
     #     return p_coords;
 
     def data_at_phys_pos(self, var, p_coords):
-        c_coords = phys2comp(p_coords)
+        c_coords = self.phys2comp(var,p_coords)
         return self.data_at_comp_pos(var,c_coords)
