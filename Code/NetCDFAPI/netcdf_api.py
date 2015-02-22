@@ -63,10 +63,10 @@ class NetCDF:
         dimensions = self.get_var_dim_names(var)
         step = []
         start = []
-        for i in len(p_coords):
+        for i in range(len(p_coords)):
             dim_data = self.get_data(dimensions[i])
             start.append( dim_data[0])
-            step.append((dim_data[len(dim_data)]-start[i])/(len(dim_data)-1))
+            step.append((dim_data[len(dim_data)-1]-start[i])/(len(dim_data)-1))
             c_coords.append((p_coords[i]-start[i])/step[i])
         return c_coords
     
