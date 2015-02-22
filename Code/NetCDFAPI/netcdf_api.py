@@ -52,8 +52,24 @@ class NetCDF:
         plt.show()
     
         
-    def data_at_comp_pos(self,var, c_coords):
+    def data_at_comp_pos(self, var, c_coords):
         vardata = self.get_data(var)
         for i in c_coords:
             vardata = vardata[i]
         return vardata
+
+    def phys2comp(p_coords, p2c_map):
+        c_coords = [];
+        for i in p_coords:
+            c_coords.append(p_coords[i] * p2c_map[i])
+        return c_coords;
+    
+    # def comp2phys(c_coords, p2c_map):
+    #     p_coords = [];
+    #     for i in c_coords:
+    #         p_coords.append(c_coords[i] / p2c_map[i])
+    #     return p_coords;
+
+    def data_at_phys_pos(self, var, p_coords, p2c_map):
+        c_coords = phys2comp(p_coords, p2c_map)
+        return self.data_at_phys_pos(var,c_coords)
