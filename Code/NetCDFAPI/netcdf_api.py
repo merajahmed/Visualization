@@ -67,7 +67,7 @@ class NetCDF:
             dim_data = self.get_data(dimensions[i])
             start.append( dim_data[0])
             step.append((dim_data[len(dim_data)-1]-start[i])/(len(dim_data)-1))
-            c_coords.append((p_coords[i]-start[i])/step[i])
+            c_coords.append(int((p_coords[i]-start[i])/step[i]))
         return c_coords
     
     # def comp2phys(c_coords, p2c_map):
