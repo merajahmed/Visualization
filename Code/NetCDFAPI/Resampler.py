@@ -43,4 +43,8 @@ n1 = NetCDF("tos_O1_2001-2002.nc")
 sampledfile = 'upsample.nc'
 sample.sample_tos_lat_lon(n1, sampledfile, 'tos', 360, 340)            
 sampledfile = 'downsample.nc'
-sample.sample_tos_lat_lon(n1, sampledfile, 'tos', 90, 85)            
+sample.sample_tos_lat_lon(n1, sampledfile, 'tos', 90, 85)      
+imshow(upsample.get_data('tos')[19])
+savefig('upsampled.png')
+imshow(downsample.get_data('tos')[19])
+savefig('downsampled.png'
