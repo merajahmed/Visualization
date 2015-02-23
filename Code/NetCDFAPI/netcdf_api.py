@@ -79,3 +79,31 @@ class NetCDF:
     def data_at_phys_pos(self, var, p_coords):
         c_coords = self.phys2comp(var,p_coords)
         return self.data_at_comp_pos(var,c_coords)
+
+    def sample(self, var, new_lon_dim, new_lat_dim):
+        dimensions = self.get_var_dim_names(var)
+        print (dimensions)
+        lons = self.get_data("lon")
+        lats = self.get_data("lat")
+        old_lon_dim = len(lons)
+        old_lat_dim = len(lats)
+        lon_min = lons[0]
+        lon_max = lons[old_lon_dim - 1]
+        lat_min = lats[0]
+        lat_max = lats[old_lat_dim - 1]
+        # print (lon_min, lon_max)
+        # print (lat_min, lat_max)
+        # print (old_lon_dim, old_lat_dim)
+        # print (new_lon_dim, new_lat_dim)
+
+        delta_lon = (lon_max - lon_min) / new_lon_dim;
+        delta_lat = (lat_max - lat_min) / new_lat_dim;
+        for i in range(0, new_lon_dim):
+            px =  delta_lon * i + lon_min
+            for j in range(0, new_lat_dim):
+                py = delta_lat * j + lat_min
+                p_coords = [px, py]
+                value = self.data_at_phys_pos(var, p_coords)
+                print(value)    # write to file
+
+
