@@ -14,14 +14,15 @@ coloring_by = 'Pres'
 mapper = vtkDataSetMapper()
 mapper.SetInputConnection(reader.GetOutputPort())
 mapper.ScalarVisibilityOn()
-mapper.SetScalarModeToUsePointData()
+mapper.ColorByArrayComponent(coloring_by,0)
+mapper.SetScalarModeToUsePointFieldData()
 mapper.SetColorModeToMapScalars()
 scalarRange = reader.GetOutputDataObject(0).GetPointData().GetArray(coloring_by).GetRange()
 mapper.SetScalarRange(scalarRange)
 
 scalarBar = vtkScalarBarActor()
 scalarBar.SetLookupTable(mapper.GetLookupTable())
-scalarBar.SetTitle("ColorLegend")
+scalarBar.SetTitle("Legend")
 scalarBar.SetNumberOfLabels(4)
 
 colorMap = vtkLookupTable()
@@ -42,10 +43,10 @@ actor.SetMapper(mapper)
 # task 2
 # actor.GetProperty().SetRepresentationToWireframe()
 # task 3
-# actor.GetProperty().SetRepresentationToSurface()
-# task 4
 actor.GetProperty().SetRepresentationToSurface()
-actor.GetProperty().EdgeVisibilityOn()
+# task 4
+# actor.GetProperty().SetRepresentationToSurface()
+# actor.GetProperty().EdgeVisibilityOn()
  
 # Create the Renderer
 renderer = vtkRenderer()
