@@ -1,5 +1,5 @@
 Group members: Meraj Khan, Xiaotong Liu
 
-The input test file is tos_O1_2001-2002.nc
+The input test file is tornado.nc
 
-Command to run the main program: python Resampler.py
+Command to run the main program: python slicer.py
