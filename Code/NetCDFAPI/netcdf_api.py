@@ -74,48 +74,18 @@ class NetCDF:
         c_coords = self.phys2comp(var,p_coords)
         return self.data_at_comp_pos(var,c_coords)
 
-
-    def sample(self, var, new_lon_dim, new_lat_dim):
-        dimensions = self.get_var_dim_names(var)
-        print (dimensions)
-        lons = self.get_data("lon")
-        lats = self.get_data("lat")
-        old_lon_dim = len(lons)
-        old_lat_dim = len(lats)
-        lon_min = lons[0]
-        lon_max = lons[old_lon_dim - 1]
-        lat_min = lats[0]
-        lat_max = lats[old_lat_dim - 1]
-
-        delta_lon = (lon_max - lon_min) / new_lon_dim;
-        delta_lat = (lat_max - lat_min) / new_lat_dim;
-        for i in range(0, new_lon_dim):
-            px =  delta_lon * i + lon_min
-            for j in range(0, new_lat_dim):
-                py = delta_lat * j + lat_min
-                p_coords = [px, py]
-                value = self.data_at_phys_pos(var, p_coords)
-                print(value)    # write to file
+    def get_slice(self, var, dim, value):
+        vardata = self.get_data(var)
+        if dim in self.get_var_names():
+            dimdata = self.get_data(dim)
+            value = dimdata.index(value)
+        dimindex = (self.get_var_dim_names(var)).index(dim)
+        condition = []
+        dimlength = self.get_var_dim_lens(var)[(self.get_var_dim_names(var)).index(dim)]
+        for i in range(dimlength):
+            if i == dimindex:
+                condition.append(True)
+            else:
+                condition.append(False)
+        return np.compress(condition, vardata, axis=dimindex)
     
-    def sample2(self, var, new_lon_dim, new_lat_dim):
-        dimensions = self.get_var_dim_names(var)
-        print (dimensions)
-        lons = self.get_data("lon")
-        lats = self.get_data("lat")
-        old_lon_dim = len(lons)
-        old_lat_dim = len(lats)
-        lon_min = lons[0]
-        lon_max = lons[old_lon_dim - 1]
-        lat_min = lats[0]
-        lat_max = lats[old_lat_dim - 1]
-
-        delta_lon = (lon_max - lon_min) / new_lon_dim;
-        delta_lat = (lat_max - lat_min) / new_lat_dim;
-        for i in range(0, new_lon_dim):
-            px = delta_lon * i + lon_min
-            cx =  int((px - lon_min) / (lon_max - lon_min) * old_lon_dim)
-            for j in range(0, new_lat_dim):
-                py = delta_lat * j + lat_min
-                cy =  int((py - lat_min) / (lat_max - lat_min) * old_lat_dim)
-                value = self.data_at_comp_pos(var, [cx,cy])
-                print(value)    # write to file
