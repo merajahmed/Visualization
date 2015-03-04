@@ -89,3 +89,20 @@ class NetCDF:
                 condition.append(False)
         return np.compress(condition, vardata, axis=dimindex)
     
+    def volume_composite(self, var, dim, dir, min_idx, max_idx, val):
+        if len(self.get_var_dim_lens(var)) != 3:
+            print var+" is not a 3D Array"
+        else:
+            data = self.get_data(var)
+            dimindex = (self.get_var_dim_names(var)).index(dim)
+            dimlength = self.get_var_dim_lens(var)[dimindex]
+            condition = []
+            for i in range(dimlength):
+                if i<=max_idx & i>=min_idx:
+                    condition.append(True)
+                else:
+                    condition.append(False)
+            
+            dimdata = compress(condition, data, axis=dimindex)
+            if dir == -1:
+                dimdata = np.swapaxes(np.swapaxes(dimdata, 0, dimindex)[::-1], 0, dimindex)
