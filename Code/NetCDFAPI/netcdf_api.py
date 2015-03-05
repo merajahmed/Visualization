@@ -136,6 +136,7 @@ class NetCDF:
                     for k in range(dimdata.shape[2]):
                         dimval = dimdata[i,j,k]
                         color[i, j, k] = scalarmap.to_rgba(dimval)[:3]
+                        #tent function map for opacity, val = 1, max_val = 0, min_val = 0
                         if dimval >= val:
                             opacity[i,j,k] = 1-((dimval-val)/(max_val-val))
                         elif dimval > val:
