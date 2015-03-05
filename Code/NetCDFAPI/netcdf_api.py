@@ -96,13 +96,64 @@ class NetCDF:
             data = self.get_data(var)
             dimindex = (self.get_var_dim_names(var)).index(dim)
             dimlength = self.get_var_dim_lens(var)[dimindex]
+            
+            #get part of the 3d array between min_idx and max_idx(both included)
             condition = []
             for i in range(dimlength):
-                if i<=max_idx & i>=min_idx:
+                if i<=max_idx and i>=min_idx:
                     condition.append(True)
                 else:
                     condition.append(False)
-            
             dimdata = compress(condition, data, axis=dimindex)
+            
+            #invert along viewing axis if dir = -1
             if dir == -1:
                 dimdata = np.swapaxes(np.swapaxes(dimdata, 0, dimindex)[::-1], 0, dimindex)
+            
+            #make the viewing axis z-axis 
+            if dimindex != 2:
+                dimdata = np.swapaxes(dimdata,2,dimindex)
+            
+            #eliminate nans
+            dimdata = np.nan_to_num(dimdata)
+            
+            max_val = nanmax(dimdata)
+            min_val = nanmin(dimdata)
+            opacity = np.empty(dimdata.shape, dtype = np.float32)
+                        
+            #create normalization scale for color mapping
+            norm = Normalize()
+            norm.autoscale(dimdata)
+            
+            #color mapping function
+            scalarmap = cm.ScalarMappable(norm=norm, cmap=cm.hot)
+            
+            color = np.empty(dimdata.shape,dtype=[('r', float),('g', float),('b',float)])
+            
+            #create transfer function
+            for i in range(dimdata.shape[0]):
+                for j in range(dimdata.shape[1]):
+                    for k in range(dimdata.shape[2]):
+                        dimval = dimdata[i,j,k]
+                        color[i, j, k] = scalarmap.to_rgba(dimval)[:3]
+                        if dimval >= val:
+                            opacity[i,j,k] = 1-((dimval-val)/(max_val-val))
+                        elif dimval > val:
+                            opacity[i,j,k] = 1-((dimval-val)/(min_val-val))
+            
+            #blending, alpha composting for each color component
+            for i in range(max_idx-min_idx+1):
+                if i == 0:
+                    R = color[:,:,0]['r']
+                    G = color[:,:,0]['g']
+                    B = color[:,:,0]['b']
+                     
+                else:
+                    R = np.add(np.multiply(R , (1-opacity[:,:,i])), np.multiply(color[:,:,i]['r'],opacity[:,:,i]))
+                    G = np.add(np.multiply(G , (1-opacity[:,:,i])), np.multiply(color[:,:,i]['g'],opacity[:,:,i]))
+                    B = np.add(np.multiply(B , (1-opacity[:,:,i])), np.multiply(color[:,:,i]['b'],opacity[:,:,i]))
+            
+            #return rgb array         
+            C = (np.dstack((R,G,B)) * 255.999) .astype(np.uint8)
+            return C
+        
