@@ -122,8 +122,8 @@ class NetCDF:
             opacity = np.empty(dimdata.shape, dtype = np.float32)
                         
             #create normalization scale for color mapping
-            norm = Normalize()
-            norm.autoscale(dimdata)
+            norm = Normalize(vmin = min_val, vmax=max_val)
+            #norm.autoscale(dimdata)
             
             #color mapping function
             scalarmap = cm.ScalarMappable(norm=norm, cmap=cm.hot)
