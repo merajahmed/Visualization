@@ -14,6 +14,7 @@ class NetCDF:
         self.ncdfgroup = Dataset(ncdfgroup)
     
     def contour2D(self, var, dim, idx, val):
+        #eliminate nans
             data = np.nan_to_num(self.get_slice(var, dim, idx))
             elim_idx = (data.shape).index(1)
             if elim_idx == 0:
@@ -27,13 +28,15 @@ class NetCDF:
                 cols = data.shape[1]
             data = np.reshape(data,(rows, cols))
             pointlist = []
+            #mark vertices with value > val as 1, and others 0
             mask = data>val
             mask = mask.astype(int)
             for i in range(rows-1):
                 for j in range(cols-1):
                     bitstring = str(mask[i][j])+str(mask[i][j+1])+str(mask[i+1][j])+str(mask[i+1][j+1])
                     case = int(bitstring, 2)
-                    #print case, i, j
+                    #find intersection points in current cell bounded by (tl, tr, br, bl) t- top, b- bottom, l- left, r- right
+                    #add edge end points as consecutive points in pointlist
                     tl = data[i][j]
                     tr = data[i][j+1]
                     bl = data[i+1][j]
