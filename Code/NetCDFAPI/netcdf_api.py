@@ -1,11 +1,191 @@
 from netCDF4 import *
 import numpy as np
 import matplotlib.pyplot as plt
+from numpy import compress, nanmax, nanmin
+import matplotlib.cm as cm
+from matplotlib.pyplot import *
+from matplotlib.colors import *
+from matplotlib.pyplot import autoscale
+from vtk import *
+
 
 class NetCDF:
     def __init__(self,ncdfgroup):
         self.ncdfgroup = Dataset(ncdfgroup)
     
+    def contour2D(self, var, dim, idx, val):
+            data = np.nan_to_num(self.get_slice(var, dim, idx))
+            elim_idx = (data.shape).index(1)
+            if elim_idx == 0:
+                rows = data.shape[1]
+                cols = data.shape[2]
+            elif elim_idx == 1:
+                rows = data.shape[0]
+                cols = data.shape[2]
+            else:
+                rows = data.shape[0]
+                cols = data.shape[1]
+            data = np.reshape(data,(rows, cols))
+            pointlist = []
+            mask = data>val
+            mask = mask.astype(int)
+            for i in range(rows-1):
+                for j in range(cols-1):
+                    bitstring = str(mask[i][j])+str(mask[i][j+1])+str(mask[i+1][j])+str(mask[i+1][j+1])
+                    case = int(bitstring, 2)
+                    #print case, i, j
+                    tl = data[i][j]
+                    tr = data[i][j+1]
+                    bl = data[i+1][j]
+                    br = data[i+1][j+1]
+                    if case == 1:
+                        y = i+1
+                        x = j+((val-bl)/(br-bl))
+                        pointlist.append((x,y))
+                        x = j+1
+                        y = i + ((val-tr)/(br-tr))
+                        pointlist.append((x,y))
+                    elif case == 2:
+                        x = j
+                        y = i+ ((val-tl)/(bl-tl))
+                        pointlist.append((x,y))
+                        y = i+1
+                        x = j+ ((val-bl)/(br-bl))
+                        pointlist.append((x,y))
+                    elif case == 3:
+                        x = j
+                        y = i + ((val-tl)/(bl-tl))
+                        pointlist.append((x,y))
+                        x = j+1
+                        y = i + ((val-tr)/(br-tr))
+                        pointlist.append((x,y))
+                    elif case == 4:
+                        y = i
+                        x = j + ((val-tl)/(tr-tl))
+                        pointlist.append((x,y))
+                        x = j+1
+                        y = i + ((val-tr)/(br-tr))
+                        pointlist.append((x,y))
+                    elif case == 5:
+                        y = i
+                        x = j + ((val-tl)/(tr-tl))
+                        pointlist.append((x,y))
+                        y = i+1
+                        x = j + ((val-bl)/(br-bl))
+                        pointlist.append((x,y))
+                    elif case == 7:
+                        y = i
+                        x = j + ((val-tl)/(tr-tl))
+                        pointlist.append((x,y))
+                        x = j 
+                        y = i + ((val-tl)/(bl-tl))
+                        pointlist.append((x,y))
+                    elif case == 8:
+                        y = i
+                        x = j+ ((val-tl)/(tr-tl))
+                        pointlist.append((x,y))
+                        x = j
+                        y = i + ((val-tl)/(bl-tl))
+                        pointlist.append((x,y))
+                    elif case == 10:
+                        y = i
+                        x = j + ((val-tl)/(tr-tl))
+                        pointlist.append((x,y))
+                        y = i + 1
+                        x = j + ((val-bl)/(br-bl))
+                        pointlist.append((x,y))
+                    elif case == 11:
+                        y = i
+                        x = j + ((val-tl)/(tr-tl))
+                        pointlist.append((x,y))
+                        x = j + 1
+                        y = i + ((val-tr)/(br-tr))
+                        pointlist.append((x,y))
+                        
+                    elif case == 12:
+                        x = j
+                        y = i + ((val-tl)/(bl-tl))
+                        pointlist.append((x,y))
+                        x = j+1
+                        y = i + ((val-tr)/(br-tr))
+                        pointlist.append((x,y))
+                        
+                    elif case == 13:
+                        x = j
+                        y = i + ((val-tl)/(bl-tl))
+                        pointlist.append((x,y))
+                        y = i+1
+                        x = j + ((val-bl)/(br-bl))
+                        pointlist.append((x,y))
+                    
+                    elif case == 14:
+                        x = j+1
+                        y = i + ((val-tr)/(br-tr))
+                        pointlist.append((x,y))
+                        y = i+1
+                        x = j + ((val-bl)/(br-bl))
+                        pointlist.append((x,y))
+                        
+                    elif case == 6:
+                        mp = (tl+tr+bl+br)/4
+                        if mp <= val:
+                            x = j
+                            y = i + ((val-tl)/(bl-tl))
+                            pointlist.append((x,y))
+                            y = i+1
+                            x = j + ((val-bl)/(br-bl))
+                            pointlist.append((x,y))
+                            y = i 
+                            x = j + ((val-tl)/(tr-tl))
+                            pointlist.append((x,y))
+                            x = j+1
+                            y = i + ((val-tr)/(br-tr))
+                            pointlist.append((x,y))
+                        else:
+                            y = i
+                            x = j + ((val-tl)/(tr-tl))
+                            pointlist.append((x,y))
+                            x = j
+                            y = i + ((val-tl)/(bl-tl))
+                            pointlist.append((x,y))
+                            x = j + 1
+                            y = i + ((val-tr)/(br-tr))
+                            pointlist.append((x,y))
+                            y = i + 1
+                            x = j + ((val-bl)/(br-bl))
+                            pointlist.append((x,y))
+                    elif case == 9:
+                        mp = (tl+tr+bl+br)/4
+                        if mp > val:
+                            x = j
+                            y = i + ((val-tl)/(bl-tl))
+                            pointlist.append((x,y))
+                            y = i+1
+                            x = j + ((val-bl)/(br-bl))
+                            pointlist.append((x,y))
+                            y = i 
+                            x = j + ((val-tl)/(tr-tl))
+                            pointlist.append((x,y))
+                            x = j+1
+                            y = i + ((val-tr)/(br-tr))
+                            pointlist.append((x,y))
+                        else:
+                            y = i
+                            x = j + ((val-tl)/(tr-tl))
+                            pointlist.append((x,y))
+                            x = j
+                            y = i + ((val-tl)/(bl-tl))
+                            pointlist.append((x,y))
+                            x = j + 1
+                            y = i + ((val-tr)/(br-tr))
+                            pointlist.append((x,y))
+                            y = i + 1
+                            x = j + ((val-bl)/(br-bl))
+                            pointlist.append((x,y))
+                            
+            return pointlist
+            
+        
     def ndims(self):
         return len(self.ncdfgroup.dimensions)
     
@@ -157,4 +337,5 @@ class NetCDF:
             #return rgb array         
             C = (np.dstack((R,G,B)) * 255.999) .astype(np.uint8)
             return C
+        
         
