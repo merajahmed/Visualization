@@ -1,4 +1,7 @@
-var fileName = "out_98.list";
+// you can change the file name and the dimensions to be shown
+// the colors of PCP polylines are colored by z position by default
+
+var fileName = "data/out_98.list";
 
 var parcoords = d3.parcoords()("#pcp")
     .alpha(0.4)
@@ -18,7 +21,7 @@ function print(a){
 var dims, halos;
 var dimNum, haloNum;
 
-d3.text('data/' + fileName, function(data) {
+d3.text(fileName, function(data) {
 
   data = data.replace("#", "");
   var lines = data.split("\n");
