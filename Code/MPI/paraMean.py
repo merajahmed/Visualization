@@ -3,6 +3,7 @@ import numpy as np
 import sys
 
 # mpirun -np 33 python paraMean.py "/Users/lxt/Downloads/isabelPressureWithHeader.raw" 4 4 2
+# mpirun -np 2 python paraMean.py "/Users/lxt/Downloads/isabelPressureWithHeader.raw" 1 1 1
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
@@ -19,7 +20,6 @@ xSize = xRes / xPar
 ySize = yRes / yPar
 zSize = zRes / zPar
 
-# # automatic MPI datatype discovery
 if rank == 0:
 	fileName = sys.argv[1]
 	data = np.fromfile(fileName, dtype=np.float32)
