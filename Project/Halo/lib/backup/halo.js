@@ -1,7 +1,7 @@
 // you can change the file name and the dimensions to be shown
 // the colors of PCP polylines are colored by z position by default
 
-var fileName = "data/basename.out";
+var fileName = "data/out_98.list";
 
 var parcoords = d3.parcoords()("#pcp")
     .alpha(0.4)
@@ -23,52 +23,35 @@ var dimNum, haloNum;
 
 d3.text(fileName, function(data) {
 
-  // data = data.replace("#", "");
-  // var lines = data.split("\n");
-  // dims = lines[0].split(" ");
-  // dimNum = dims.length;
-  // for (var i in dims){
-  //   dims[i] = dims[i].toLowerCase();
-  // }
-  // print (dims)
-  // dims = dims.slice(0,23);
-  // halos = [];
-  // for (var i = 17; i < lines.length - 1; i++){
-  //   var row = lines[i];
-  //   var col = row.split(" ");
-  //   var obj = {}
-  //   for (var j = 0; j < dims.length; j++){
-  //     obj[dims[j]] = +col[j];
-  //   }
-  //   halos.push(obj)
-  // }
   data = data.replace("#", "");
   var lines = data.split("\n");
-  dims = lines[2].split("\t");
-  dimNum = dims.length - 1;
-  dims = dims.slice(0, dimNum)
+  dims = lines[0].split(" ");
+  dimNum = dims.length;
+  for (var i in dims){
+    dims[i] = dims[i].toLowerCase();
+  }
   print (dims)
+  // select dimensions to show
+  dims = dims.slice(0,23);
   halos = [];
-  for (var i = 3; i < lines.length - 1; i++){
-  // for (var i = 3; i <  5; i++){
+  for (var i = 17; i < lines.length - 1; i++){
     var row = lines[i];
-    var col = row.split("\t");
+    var col = row.split(" ");
     var obj = {}
-    for (var j = 0; j < dimNum; j++){
-      // print (col[j])
+    for (var j = 0; j < dims.length; j++){
       obj[dims[j]] = +col[j];
     }
     halos.push(obj)
   }
 
-  var COLOR_DIM = dims[5];
+  var COLOR_DIM = "z"; //dims[4];
   var normalize = d3.scale.linear().range([0,1])
     .domain(d3.extent(halos, function(d) { return d[COLOR_DIM]; }));;
 
    parcoords
     .data(halos)
-    .hideAxis([dims[0]])
-    // .hideAxis(["descid"])
+    .hideAxis(["id"])
+    .hideAxis(["descid"])
     .composite("darker")
     .color(function(d) { return getColor(normalize(d[COLOR_DIM])); })  // quantitative color scale
     .alpha(0.2)
@@ -77,7 +60,7 @@ d3.text(fileName, function(data) {
     .brushMode("1D-axes");
 
   // setting up grid
-  halos.forEach(function(d,i) { d.id = d.id || i; });
+ 
   var column_keys = d3.keys(halos[0]);
   print (column_keys)
   var columns = column_keys.map(function(key,i) {
@@ -139,10 +122,6 @@ d3.text(fileName, function(data) {
   });
   grid.onMouseLeave.subscribe(function(e,args) {
     parcoords.unhighlight();
-  });
-  grid.onClick.subscribe(function(e,args) {
-    var i = grid.getCellFromEvent(e).row;
-    alert("Selected halo " + i +":"+halos[i].x + "," + halos[i].y + "," + halos[i].z)
   });
 
   // fill grid with halos
