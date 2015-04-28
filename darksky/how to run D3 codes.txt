@@ -1,0 +1,5 @@
+For any codes that are made by HTLM5 and Javascript, you will need a Browser to run the program. A server needs to be created to load  data and hander requests from the client (Browser). 
+
+To build a local server on your own machine, the simplest way is to run the command "python -m http.server 8888" in the directory of your HTML5/Javascript files. Then, just visit "localhost:8888/index.html" in your Browser, and you will be directed to the index.html file in the directory of your HTML5/Javascript files. Here "8888" is the port number that the server listens to, and "index.html" is the web page that you want to visit.
+
+Make sure you have installed python on your machine.
