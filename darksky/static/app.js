@@ -74,6 +74,7 @@ var zScale = d3.scale.linear()
 
 var mat = new THREE.ParticleBasicMaterial({
     vertexColors: true,
+    
     size: 10
 });
 

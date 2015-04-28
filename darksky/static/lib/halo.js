@@ -61,7 +61,7 @@ d3.text(fileName, function(data) {
     halos.push(obj)
   }
 
-  var COLOR_DIM = dims[5];
+  var COLOR_DIM = dims[6];
   var normalize = d3.scale.linear().range([0,1])
     .domain(d3.extent(halos, function(d) { return d[COLOR_DIM]; }));;
 
