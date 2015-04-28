@@ -142,8 +142,7 @@ d3.text(fileName, function(data) {
   });
   grid.onClick.subscribe(function(e,args) {
     var i = grid.getCellFromEvent(e).row;
-    alert("Selected halo " + i +":"+halos[i].x + "," + halos[i].y + "," + halos[i].z)
-    haloView(i);
+    haloView(halos[i].id);
   });
 
   // fill grid with halos
