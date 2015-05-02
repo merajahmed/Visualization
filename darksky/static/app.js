@@ -2,8 +2,9 @@ $(document).ready(function (){
     var renderer = new THREE.WebGLRenderer({
         antialias: true
     });
-    var w = 1290;
+    var w = window.innerWidth;
     var h = 600;
+    //$(window).height-40;
     renderer.setSize(w, h);
     var halodiv = document.getElementById('halo');
     halodiv.appendChild(renderer.domElement);
@@ -18,13 +19,13 @@ $(document).ready(function (){
     scene.add(scatterPlot);
 
     scatterPlot.rotation.y = 0;
-    var unfiltered = [],
-    lowPass = [],
-    highPass = [];
+    var unfiltered = [];
 
 var format = d3.format("+.3f");
 var HaloId = GetParameterValues('HaloId');
-var particlefile = "static/hot/"+HaloId.toString()+".csv";
+var Colormap = GetParameterValues('Colormap');
+
+var particlefile = "static/"+Colormap+"/"+HaloId.toString()+".csv";
 var data = d3.csv(particlefile, function (d) {
     
     d.forEach(function (d,i) {
@@ -42,39 +43,38 @@ var data = d3.csv(particlefile, function (d) {
         };
     })
 
-var xExent = d3.extent(unfiltered, function (d) {return d.x; }),
-    yExent = d3.extent(unfiltered, function (d) {return d.y; }),
-    zExent = d3.extent(unfiltered, function (d) {return d.z; }),
-    pExent = d3.extent(unfiltered, function (d) {return d.p; });
+var xExtent = d3.extent(unfiltered, function (d) {return d.x; }),
+    yExtent = d3.extent(unfiltered, function (d) {return d.y; }),
+    zExtent = d3.extent(unfiltered, function (d) {return d.z; }),
+    pExtent = d3.extent(unfiltered, function (d) {return d.p; });
 
 var vpts = {
-    xMax: xExent[1],
-    xCen: (xExent[1] + xExent[0]) / 2,
-    xMin: xExent[0],
-    yMax: yExent[1],
-    yCen: (yExent[1] + yExent[0]) / 2,
-    yMin: yExent[0],
-    zMax: zExent[1],
-    zCen: (zExent[1] + zExent[0]) / 2,
-    zMin: zExent[0]
+    xMax: xExtent[1],
+    xCen: (xExtent[1] + xExtent[0]) / 2,
+    xMin: xExtent[0],
+    yMax: yExtent[1],
+    yCen: (yExtent[1] + yExtent[0]) / 2,
+    yMin: yExtent[0],
+    zMax: zExtent[1],
+    zCen: (zExtent[1] + zExtent[0]) / 2,
+    zMin: zExtent[0]
 }
 
 var colour = d3.scale.category20c();
 
 var xScale = d3.scale.linear()
-              .domain(xExent)
+              .domain(xExtent)
               .range([-600,600]);
 var yScale = d3.scale.linear()
-              .domain(yExent)
+              .domain(yExtent)
               .range([-600,600]);                  
 var zScale = d3.scale.linear()
-              .domain(zExent)
+              .domain(zExtent)
               .range([-600,600]);
 
 
 var mat = new THREE.ParticleBasicMaterial({
     vertexColors: true,
-    
     size: 10
 });
 
@@ -86,9 +86,11 @@ for (var i = 0; i < pointCount; i ++) {
     var z = zScale(unfiltered[i].z);
     pointGeo.vertices.push(new THREE.Vector3(x, y, z));
     //use the following line to color by density of particles
-    //pointGeo.colors.push(new THREE.Color().setRGB(unfiltered[i].pr,unfiltered[i].pg,unfiltered[i].pb));
-    //use the following line to color by particle velocity
-    pointGeo.colors.push(new THREE.Color().setRGB(unfiltered[i].vr,unfiltered[i].vg,unfiltered[i].vb));
+    var Attribute = GetParameterValues('Attribute');
+    if (Attribute == 'p')
+    	pointGeo.colors.push(new THREE.Color().setRGB(unfiltered[i].pr,unfiltered[i].pg,unfiltered[i].pb));
+    else
+    	pointGeo.colors.push(new THREE.Color().setRGB(unfiltered[i].vr,unfiltered[i].vg,unfiltered[i].vb));
 }
 var points = new THREE.ParticleSystem(pointGeo, mat);
 scatterPlot.add(points);
@@ -121,6 +123,7 @@ window.onmousemove = function(ev) {
 var animating = false;
 window.ondblclick = function() {
     animating = !animating;
+    animate(animating);
 };
 
 function animate(t) {
@@ -130,7 +133,7 @@ function animate(t) {
             var v = pointGeo.vertices;
             for (var i = 0; i < v.length; i++) {
                 var u = v[i];
-                console.log(u)
+                //console.log(u)
                 u.angle += u.speed * 0.01;
                 u.x = Math.cos(u.angle) * u.radius;
                 u.z = Math.sin(u.angle) * u.radius;
@@ -208,3 +211,24 @@ onmessage = function(ev) {
         }  
     }  
 
+    function togglemap(){
+    	var Colormap = $("#colormap").val();
+    	Attribute = GetParameterValues('Attribute');
+    	if (Colormap!= GetParameterValues('Colormap')){
+    		url = "http://localhost:8000/haloview.html?HaloId="+GetParameterValues('HaloId')+"&&Colormap="+Colormap+"&&Attribute="+Attribute;
+    		window.location.assign(url);
+    	}
+    		
+    		
+    }
+    function toggleattribute(){
+    	var Attribute = $("#attribute").val();
+    	var Colormap = GetParameterValues('Colormap');
+    	if (Attribute!= GetParameterValues('Attribute')){
+    		url = "http://localhost:8000/haloview.html?HaloId="+GetParameterValues('HaloId')+"&&Colormap="+Colormap+"&&Attribute="+Attribute;
+    		window.location.assign(url);
+    	}
+    }
+    function cmref(){
+    	window.open('cmreference.html');
+    }

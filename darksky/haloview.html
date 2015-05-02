@@ -1,5 +1,5 @@
 <html>
-
+<title>Halo View</title>
 <head>
     <script src="static/three.min.js"></script>
     <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
@@ -11,10 +11,11 @@
         margin: 0px;
         padding: 0px;
     }
-    #container {
+    <!--#container {
         width:960px;
-        height:900px;
+        height:500px;
     }
+    -->
     </style>
 
 </head>
@@ -23,7 +24,19 @@
 
 <!--div id="container"></div-->
 <div id ="halo"></div> 
+<select id="colormap" onChange=togglemap()>
+	<option value="" disabled selected>Select Colormap</option>
+	<option value="hot">Hot</option> 
+	<option value="BuGn">BuGn(BlueGreen)</option>
+	<option value="cool">Cool</option>
+	<option value="spring">Spring</option>
+</select>
+<select id="attribute" onChange=toggleattribute()>
+	<option value="" disabled selected>Select Attribute</option>
+	<option value="v">Velocity</option> 
+	<option value="p">Density</option>
+</select>
+<input type="button" value="Color Map Reference Chart" onclick=cmref()></input>
 </body>
-
 </html>
 
