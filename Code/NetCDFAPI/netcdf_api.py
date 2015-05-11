@@ -322,7 +322,7 @@ class NetCDF:
                         #tent function map for opacity, val = 1, max_val = 0, min_val = 0
                         if dimval >= val:
                             opacity[i,j,k] = 1-((dimval-val)/(max_val-val))
-                        elif dimval > val:
+                        elif dimval < val:
                             opacity[i,j,k] = 1-((dimval-val)/(min_val-val))
             
             #blending, alpha composting for each color component
